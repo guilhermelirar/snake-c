@@ -31,6 +31,12 @@ Game* createGame() {
 
   Game *pgame = (Game*)malloc(sizeof(Game));
 
+  if (!pgame) {
+    printf("Error when creating window: %s\n", SDL_GetError());
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+  }
+
   pgame->window = window;
   pgame->renderer = renderer;
   pgame->snake = NULL;
