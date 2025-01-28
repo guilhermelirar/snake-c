@@ -87,10 +87,32 @@ void render(Game *game) {
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
 
-  SDL_Rect whiteRect = {SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100, 100,
-                        50};
+  // Used to rendering tiles
+  SDL_Rect rect = {0, 0, TILE_SIZE, TILE_SIZE};
 
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-  SDL_RenderFillRect(renderer, &whiteRect);
+  // For each tile
+  for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
+    for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
+      // Position of the rect
+      rect.y = TILE_SIZE * y;
+      rect.x = TILE_SIZE * x;
+
+      switch (game->map[y][x]) {
+        case VOID: // Grid-like 
+          SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+          SDL_RenderDrawRect(renderer, &rect);
+        break;
+        case SNAKE: // White
+          SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+          SDL_RenderFillRect(renderer, &rect);
+        break;
+        case FRUIT: // Red
+          SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+          SDL_RenderFillRect(renderer, &rect);
+        break;
+      }
+    }
+  }
+
   SDL_RenderPresent(renderer);
 }
