@@ -8,14 +8,26 @@
 #include <SDL2/SDL.h>
 #include "snake.h"
 
+typedef enum {
+  SNAKE,
+  VOID,
+  FRUIT
+} TileStatus;
+
+typedef TileStatus GameMap[SCREEN_HEIGHT / TILE_SIZE][SCREEN_WIDTH / TILE_SIZE];
+
 typedef struct {
   SDL_Window *window;
   SDL_Renderer *renderer;
   Snake *snake;
+  GameMap map;
 } Game;
 
 Game* createGame();
 
+// Update contents in window
+void render(Game* game);
+void initMap(Game* game);
 void destroyGame(Game* game);
 
 #endif // GAME_H

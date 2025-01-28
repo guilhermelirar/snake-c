@@ -4,10 +4,7 @@
 int main(int argc, char *argv[]) {
   Game *game = createGame();
 
-  SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-  SDL_RenderClear(game->renderer); 
-  // Updates window
-  SDL_RenderPresent(game->renderer);
+  render(game);
 
   SDL_Delay(5000); 
 

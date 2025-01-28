@@ -38,10 +38,12 @@ Game* createGame() {
     SDL_DestroyWindow(window);
   }
 
+  // Setting members
   pgame->window = window;
   pgame->renderer = renderer;
   pgame->snake = createStartSnake();
- 
+  initMap(pgame);
+
   return pgame;
 }
 
@@ -60,4 +62,35 @@ void destroyGame(Game* game) {
 
   free(game);
   SDL_Quit();
+}
+
+void initMap(Game *game) {
+  // Initializing tilemap with void
+  for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
+    for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
+      game->map[y][x] = VOID;
+    }
+  }
+
+  // Updating with the initial snake positions
+  struct SnakePart *part = game->snake->head;
+  while (part != NULL) {
+    struct SnakePart *next = part->previous;
+    game->map[part->y / TILE_SIZE][part->x / TILE_SIZE] = SNAKE;
+    part = next;
+  }
+}
+
+
+void render(Game *game) {
+  SDL_Renderer *renderer = game->renderer;
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+  SDL_RenderClear(renderer);
+
+  SDL_Rect whiteRect = {SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100, 100,
+                        50};
+
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  SDL_RenderFillRect(renderer, &whiteRect);
+  SDL_RenderPresent(renderer);
 }
