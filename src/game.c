@@ -1,4 +1,5 @@
 #include "../include/game.h"
+#include "../include/snake.h"
 #include <stdlib.h>
 
 Game* createGame() {
@@ -39,7 +40,7 @@ Game* createGame() {
 
   pgame->window = window;
   pgame->renderer = renderer;
-  pgame->snake = NULL;
+  pgame->snake = createStartSnake();
  
   return pgame;
 }
@@ -54,7 +55,7 @@ void destroyGame(Game* game) {
   }
 
   if (game->snake) {
-    free(game->snake);
+    destroySnake(game->snake); 
   }
 
   free(game);

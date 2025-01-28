@@ -3,24 +3,15 @@
 #define GAME_H
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+#define TILE_SIZE 50 
 
 #include <SDL2/SDL.h>
-
-struct SnakePart {
-  int x, y;
-  struct SnakePart* previous;
-};
-
-struct Snake {
-  int length;
-  struct SnakePart* head;
-  struct SnakePart* tail;
-};
+#include "snake.h"
 
 typedef struct {
   SDL_Window *window;
   SDL_Renderer *renderer;
-  struct Snake *snake;
+  Snake *snake;
 } Game;
 
 Game* createGame();
