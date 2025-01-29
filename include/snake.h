@@ -2,7 +2,7 @@
 #define SNAKE_H
 
 typedef enum {
-  TOP, DOWN, LEFT, RIGHT
+  UP, DOWN, LEFT, RIGHT
 } Direction;
 
 struct SnakePart {
@@ -10,7 +10,7 @@ struct SnakePart {
   struct SnakePart* previous;
 };
 
-typedef struct {
+typedef struct Snake {
   int length;
   struct SnakePart* head;
   struct SnakePart* tail;

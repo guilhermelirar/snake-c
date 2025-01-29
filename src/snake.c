@@ -30,7 +30,7 @@ Snake* createStartSnake() {
     return NULL;
   }
 
-  psnake->dir = TOP;
+  psnake->dir = UP;
 
   struct SnakePart* p1 = newPart(400, 500, NULL);
   struct SnakePart* p2 = newPart(400, 500 - TILE_SIZE, p1);
