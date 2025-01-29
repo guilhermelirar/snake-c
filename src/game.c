@@ -2,7 +2,12 @@
 #include "../include/snake.h"
 #include <stdlib.h>
 
-Game* createGame() {
+Game* getGame() {
+  static Game* game = NULL;
+  if (game != NULL) {
+    return game;
+  }
+
   // Initializing SDL
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("Error when initializing SDL: %s\n", SDL_GetError());
@@ -31,23 +36,24 @@ Game* createGame() {
   }
 
   // Creating a game struct
-  Game *pgame = (Game*)malloc(sizeof(Game));
-  if (!pgame) {
+  game = (Game*)malloc(sizeof(Game));
+  if (!game) {
     printf("Error when creating window: %s\n", SDL_GetError());
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
   }
 
   // Setting members
-  pgame->window = window;
-  pgame->renderer = renderer;
-  pgame->snake = createStartSnake();
-  initMap(pgame);
+  game->window = window;
+  game->renderer = renderer;
+  game->snake = createStartSnake();
+  initMap();
 
-  return pgame;
+  return game;
 }
 
-void destroyGame(Game* game) {  
+void destroyGame() {
+  Game* game = getGame();
   if (game->renderer) {
     SDL_DestroyRenderer(game->renderer);
   }
@@ -64,7 +70,8 @@ void destroyGame(Game* game) {
   SDL_Quit();
 }
 
-void initMap(Game *game) {
+void initMap() {
+  Game* game = getGame();
   // Initializing tilemap with void
   for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
     for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
@@ -82,7 +89,8 @@ void initMap(Game *game) {
 }
 
 
-void render(Game *game) {
+void drawGame() {
+  Game* game = getGame();
   SDL_Renderer *renderer = game->renderer;
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
@@ -117,7 +125,8 @@ void render(Game *game) {
   SDL_RenderPresent(renderer);
 }
 
-void handleInput(Game* game) {
+void handleInput() {
+  Game* game = getGame();
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_QUIT) {
@@ -156,12 +165,13 @@ void handleInput(Game* game) {
   }
 }
 
-void run(Game* game) {
+void run() {
+  Game* game = getGame();
   game->status = RUNNING;
 
   while (game->status != QUIT_REQUESTED) {
-    handleInput(game);
-    render(game);
+    handleInput();
+    drawGame();
     SDL_Delay(30);
   }
 }

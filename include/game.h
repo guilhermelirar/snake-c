@@ -30,12 +30,12 @@ typedef struct {
   GameStatus status;
 } Game;
 
-Game* createGame();
+Game* getGame();
 
 // Update contents in window
-void render(Game* game);
-void initMap(Game* game);
-void destroyGame(Game* game);
-void run(Game* game);
+void drawGame();
+void initMap();
+void destroyGame();
+void run();
 
 #endif // GAME_H

@@ -2,8 +2,7 @@
 #include "include/game.h"
 
 int main(int argc, char *argv[]) {
-  Game *game = createGame();
-  run(game);
-  destroyGame(game);
+  run();
+  destroyGame();
   return 0;
 }
