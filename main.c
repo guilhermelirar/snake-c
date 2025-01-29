@@ -3,11 +3,7 @@
 
 int main(int argc, char *argv[]) {
   Game *game = createGame();
-
-  render(game);
-
-  SDL_Delay(5000); 
-
+  run(game);
   destroyGame(game);
   return 0;
 }

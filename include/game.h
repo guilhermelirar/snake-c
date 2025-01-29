@@ -6,13 +6,19 @@
 #define TILE_SIZE 50 
 
 #include <SDL2/SDL.h>
-#include "snake.h"
+typedef struct Snake Snake;
 
 typedef enum {
   SNAKE,
   VOID,
   FRUIT
 } TileStatus;
+
+typedef enum {
+  RUNNING,
+  PAUSED,
+  QUIT_REQUESTED
+} GameStatus;
 
 typedef TileStatus GameMap[SCREEN_HEIGHT / TILE_SIZE][SCREEN_WIDTH / TILE_SIZE];
 
@@ -21,6 +27,7 @@ typedef struct {
   SDL_Renderer *renderer;
   Snake *snake;
   GameMap map;
+  GameStatus status;
 } Game;
 
 Game* createGame();
@@ -29,5 +36,6 @@ Game* createGame();
 void render(Game* game);
 void initMap(Game* game);
 void destroyGame(Game* game);
+void run(Game* game);
 
 #endif // GAME_H

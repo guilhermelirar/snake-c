@@ -30,8 +30,8 @@ Game* createGame() {
     return NULL;
   }
 
+  // Creating a game struct
   Game *pgame = (Game*)malloc(sizeof(Game));
-
   if (!pgame) {
     printf("Error when creating window: %s\n", SDL_GetError());
     SDL_DestroyRenderer(renderer);
@@ -115,4 +115,53 @@ void render(Game *game) {
   }
 
   SDL_RenderPresent(renderer);
+}
+
+void handleInput(Game* game) {
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    if (event.type == SDL_QUIT) {
+      game->status = QUIT_REQUESTED;
+      return;
+    }
+
+    if (event.type == SDL_KEYDOWN) {
+      // Snake movement
+      switch (event.key.keysym.sym) {
+        case (SDLK_UP): {
+          game->snake->dir = UP;
+          break;
+        }
+        case (SDLK_DOWN): {
+          game->snake->dir = DOWN;
+          break;
+        }
+        case (SDLK_LEFT): {
+          game->snake->dir = LEFT;
+          break;
+        }
+        case (SDLK_RIGHT): {
+          game->snake->dir = RIGHT;
+          break;
+        }  
+        default:
+          break;
+      }
+
+      if (event.key.keysym.sym == SDLK_SPACE) {
+        // Pause if running, resume if paused
+        game->status = game->status == RUNNING ? PAUSED : RUNNING;
+      }
+    }
+  }
+}
+
+void run(Game* game) {
+  game->status = RUNNING;
+
+  while (game->status != QUIT_REQUESTED) {
+    handleInput(game);
+    render(game);
+    SDL_Delay(30);
+  }
 }
