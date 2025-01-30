@@ -46,8 +46,8 @@ Game* getGame() {
   // Setting members
   game->window = window;
   game->renderer = renderer;
-  game->snake = createStartSnake();
   initMap();
+  game->snake = initSnake();
 
   return game;
 }
@@ -77,14 +77,6 @@ void initMap() {
     for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
       game->map[y][x] = VOID;
     }
-  }
-
-  // Updating with the initial snake positions
-  struct SnakePart *part = game->snake->head;
-  while (part != NULL) {
-    struct SnakePart *next = part->previous;
-    game->map[part->y / TILE_SIZE][part->x / TILE_SIZE] = SNAKE;
-    part = next;
   }
 }
 
