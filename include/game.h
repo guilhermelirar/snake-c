@@ -36,6 +36,9 @@ Game* getGame();
 void drawGame();
 void initMap();
 void destroyGame();
+
+/* Updates the state of the game */
+void update();
 void run();
 
 #endif // GAME_H

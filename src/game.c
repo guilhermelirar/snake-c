@@ -1,5 +1,6 @@
 #include "../include/game.h"
 #include "../include/snake.h"
+#include "../include/utils.h"
 #include <stdlib.h>
 
 Game* getGame() {
@@ -157,12 +158,48 @@ void handleInput() {
   }
 }
 
+void update() {
+  Snake *snake = getGame()->snake;
+  Direction dir = snake->dir;
+  int headX = snake->head->x, headY = snake->head->y;
+
+  // Snake collided with the limits of the map
+  if ((headX == 0 && dir == LEFT) ||
+      (headX == SCREEN_WIDTH / TILE_SIZE - 1 && dir == RIGHT) ||
+      (headY == 0 && dir == UP) ||
+      (headY == SCREEN_HEIGHT / TILE_SIZE - 1 && dir == DOWN)) {
+    getGame()->status = QUIT_REQUESTED;
+    return;
+  }
+
+  TileStatus snakeTargetStatus =
+      getGame()->map[headY + (dir == DOWN) - (dir == UP)]
+                    [headX + (dir == RIGHT) - (dir == LEFT)];
+
+  if (snakeTargetStatus == SNAKE) {
+    getGame()->status = QUIT_REQUESTED;
+    return;
+  } 
+
+  moveSnake(snake);
+}
+
 void run() {
   Game* game = getGame();
   game->status = RUNNING;
 
+  Timer timer = {0.0f, .3f, update};
+  Uint32 frameStart = 0;
+  float dt;
   while (game->status != QUIT_REQUESTED) {
+    dt = calculateDeltaTime(&frameStart);
+    
     handleInput();
+
+    if (game->status == RUNNING) {
+      updateTimer(&timer, dt);
+    }
+
     drawGame();
     SDL_Delay(30);
   }
