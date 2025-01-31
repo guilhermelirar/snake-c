@@ -20,16 +20,15 @@ typedef struct Snake {
   Direction dir;
 } Snake;
 
-// Pop tail (for moving)
-SnakePart* popTail(Snake* snake);
-// New snake part
-SnakePart* newPart(int x, int y, struct SnakePart* previous);
-
 /* Creates a new part and makes it the new head, 
  * positioned in the target position of the snake.
  * Assumes target position is inside the map.
  * Assumes the snake has at least a head. */
 void growSnake(Snake* snake);
+
+/* Moves the snake to the target direction.
+ * Assumes it exists on the map */
+void moveSnake(Snake* snake);
 
 void destroySnake(Snake* snake);
 

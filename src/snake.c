@@ -1,31 +1,22 @@
 #include "../include/snake.h"
 #include "../include/game.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+
 // Free resources
 void destroySnake(Snake* snake) {
-  struct SnakePart *part = snake->head;
-  while (part != NULL) {
-    struct SnakePart *next = part->previous;
-    free(part);
-    part = next;
+  SnakePart* current = snake->head;
+  while (current != NULL) {
+    SnakePart* next = current->next;
+    free(current);
+    current = next;
   }
+
   free(snake);
 }
 
-struct SnakePart* newPart(int x, int y, struct SnakePart* previous) {
-  struct SnakePart* np = malloc(sizeof(struct SnakePart));
-  if (!np) {
-    return NULL;
-  }
-  np->x = x; np->y = y;
-  np->previous = previous;
-  return np;
-}
-
-
 void growSnake(Snake* snake) {
+  if (snake == NULL) return;
   Direction dir = snake->dir;
   SnakePart* part = (SnakePart*)malloc(sizeof(SnakePart));
 
@@ -36,12 +27,26 @@ void growSnake(Snake* snake) {
   getGame()->map[part->y][part->x] = SNAKE;
 
   // Linking into the snake
-  part->previous = snake->head;
-  part->next = NULL;
+  part->previous = NULL;
+  part->next = snake->head;
+  snake->head->previous = part;
   snake->head = part;
-  part->previous->next = part;
 
   snake->length++;
+}
+
+void moveSnake(Snake *snake) {
+  SnakePart *oldTail = snake->tail;
+ 
+  // Unlinks the tail
+  snake->tail = oldTail->previous; // New tail
+  snake->tail->next = NULL; // Tail doesn't have a next
+  int x = oldTail->x, y = oldTail->y; 
+
+  free(oldTail);
+
+  getGame()->map[y][x] = VOID;
+  growSnake(snake);
 }
 
 // Creates snake with 3 parts
@@ -62,7 +67,6 @@ Snake* initSnake() {
   psnake->head = tail0;
   psnake->tail = tail0;
   
-
   getGame()->map[tail0->y][tail0->x] = SNAKE;
 
   psnake->dir = UP;
