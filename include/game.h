@@ -34,11 +34,20 @@ Game* getGame();
 
 // Update contents in window
 void drawGame();
+
+// Initialize the map with VOID
 void initMap();
+
+// Free resources
 void destroyGame();
 
-/* Updates the state of the game */
+// Handles fruit
+void spawnFruit();
+
+// Updates the state of the game
 void update();
+
+// Start game loop
 void run();
 
 #endif // GAME_H

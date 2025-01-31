@@ -1,6 +1,7 @@
 #include "../include/game.h"
 #include "../include/snake.h"
 #include "../include/utils.h"
+#include "time.h"
 #include <stdlib.h>
 
 Game* getGame() {
@@ -49,6 +50,9 @@ Game* getGame() {
   game->renderer = renderer;
   initMap();
   game->snake = initSnake();
+  
+  srand(time(NULL));
+  spawnFruit();
 
   return game;
 }
@@ -82,6 +86,32 @@ void initMap() {
 }
 
 
+void spawnFruit() {
+  // To avoid calling rand() more than once
+  int availableTiles =
+      (SCREEN_HEIGHT * SCREEN_WIDTH) / (TILE_SIZE * TILE_SIZE) -
+      getGame()->snake->length - 1;
+
+  if (availableTiles == 0) {
+    return;
+  }
+
+  GameMap *map = &getGame()->map;
+  int i = rand() % availableTiles;
+
+  for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
+    for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
+      if ((*map)[y][x] == VOID) {
+        i--;
+        if (i == 0) {
+          (*map)[y][x] = FRUIT;
+          return;
+        }
+      }
+    }
+  }
+}
+
 void drawGame() {
   Game* game = getGame();
   SDL_Renderer *renderer = game->renderer;
@@ -100,11 +130,11 @@ void drawGame() {
 
       switch (game->map[y][x]) {
         case VOID: // Grid-like 
-          SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+          SDL_SetRenderDrawColor(renderer, 50, 50, 50, 15);
           SDL_RenderDrawRect(renderer, &rect);
         break;
-        case SNAKE: // White
-          SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        case SNAKE: // Green
+          SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
           SDL_RenderFillRect(renderer, &rect);
         break;
         case FRUIT: // Red
@@ -127,33 +157,46 @@ void handleInput() {
       return;
     }
 
+    if (event.key.keysym.sym == SDLK_SPACE) {
+      // Pause if running, resume if paused
+      game->status = game->status == RUNNING ? PAUSED : RUNNING;
+    }
+
+    Direction *dir = &game->snake->dir;
+    Direction newDir = *dir;
     if (event.type == SDL_KEYDOWN) {
       // Snake movement
       switch (event.key.keysym.sym) {
         case (SDLK_UP): {
-          game->snake->dir = UP;
+          newDir = UP;
           break;
         }
         case (SDLK_DOWN): {
-          game->snake->dir = DOWN;
+          newDir = DOWN;
           break;
         }
         case (SDLK_LEFT): {
-          game->snake->dir = LEFT;
+          newDir = LEFT;
           break;
         }
         case (SDLK_RIGHT): {
-          game->snake->dir = RIGHT;
+          newDir = RIGHT;
           break;
         }  
         default:
           break;
       }
 
-      if (event.key.keysym.sym == SDLK_SPACE) {
-        // Pause if running, resume if paused
-        game->status = game->status == RUNNING ? PAUSED : RUNNING;
-      }
+      if (*dir == UP && newDir == DOWN)
+        return; 
+      if (*dir == DOWN && newDir == UP)
+        return;
+      if (*dir == LEFT && newDir == RIGHT)
+        return;
+      if (*dir == RIGHT && newDir == LEFT)
+        return;
+      
+      *dir = newDir;
     }
   }
 }
@@ -179,7 +222,13 @@ void update() {
   if (snakeTargetStatus == SNAKE) {
     getGame()->status = QUIT_REQUESTED;
     return;
-  } 
+  }
+
+  if (snakeTargetStatus == FRUIT) {
+    growSnake(snake);
+    spawnFruit();
+    return;
+  }
 
   moveSnake(snake);
 }

@@ -44,6 +44,7 @@ void moveSnake(Snake *snake) {
   int x = oldTail->x, y = oldTail->y; 
 
   free(oldTail);
+  snake->length--;
 
   getGame()->map[y][x] = VOID;
   growSnake(snake);
