@@ -1,6 +1,6 @@
-#include "../include/game.h"
-#include "../include/snake.h"
-#include "../include/utils.h"
+#include "game.h"
+#include "snake.h"
+#include "utils.h"
 #include "time.h"
 #include <stdlib.h>
 
@@ -149,7 +149,7 @@ void handleInput() {
   Game* game = getGame();
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
-    if (event.type == SDL_QUIT) {
+    if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
       game->status = QUIT_REQUESTED;
       return;
     }

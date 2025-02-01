@@ -35,6 +35,7 @@ void growSnake(Snake* snake);
  * Assumes it exists on the map */
 void moveSnake(Snake* snake);
 
+/* Free memory allocated to the snake */
 void destroySnake(Snake* snake);
 
 /* Creates the snake of the start of 

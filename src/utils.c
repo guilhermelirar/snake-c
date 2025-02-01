@@ -1,4 +1,4 @@
-#include "../include/utils.h"
+#include "utils.h"
 
 void updateTimer(Timer *timer, float dt) {
   timer->elapsedTime += dt;

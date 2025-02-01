@@ -7,7 +7,6 @@
 #define MAP_WIDTH SCREEN_WIDTH / TILE_SIZE
 #define MAP_HEIGHT SCREEN_HEIGHT / TILE_SIZE
 
-
 #include <SDL2/SDL.h>
 typedef struct Snake Snake;
 
@@ -33,24 +32,26 @@ typedef struct {
   GameStatus status;
 } Game;
 
+/* Returns the Game pointer (singleton) */
 Game* getGame();
 
-// Update contents in window
+/* Render contents in window */
 void drawGame();
 
-// Initialize the map with VOID
+/* Sets all positions of the map with VOID */
 void initMap();
 
-// Free resources
+/* Frees resources */
 void destroyGame();
 
-// Handles fruit
+/* Spawns one fruit on a previously VOID position 
+ * of the map */
 void spawnFruit();
 
-// Updates the state of the game
+/* Updates the Game state */
 void update();
 
-// Start game loop
+/* Runs the main loop */
 void run();
 
 #endif // GAME_H

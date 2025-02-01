@@ -1,5 +1,5 @@
-#include "../include/snake.h"
-#include "../include/game.h"
+#include "snake.h"
+#include "game.h"
 #include <stdio.h>
 #include <stdlib.h>
 
