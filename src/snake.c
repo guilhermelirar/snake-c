@@ -21,10 +21,10 @@ void growSnake(Snake* snake) {
   SnakePart* part = (SnakePart*)malloc(sizeof(SnakePart));
 
   // Index of the new head
-  part->x = snake->head->x + (dir == RIGHT) - (dir == LEFT);
-  part->y = snake->head->y + (dir == DOWN) - (dir == UP);
+  part->pos.x = snake->head->pos.x + (dir == RIGHT) - (dir == LEFT);
+  part->pos.y = snake->head->pos.y + (dir == DOWN) - (dir == UP);
 
-  getGame()->map[part->y][part->x] = SNAKE;
+  getGame()->map[part->pos.y][part->pos.x] = SNAKE;
 
   // Linking into the snake
   part->previous = NULL;
@@ -41,12 +41,12 @@ void moveSnake(Snake *snake) {
   // Unlinks the tail
   snake->tail = oldTail->previous; // New tail
   snake->tail->next = NULL; // Tail doesn't have a next
-  int x = oldTail->x, y = oldTail->y; 
+  Position pos = oldTail->pos; 
 
   free(oldTail);
   snake->length--;
 
-  getGame()->map[y][x] = VOID;
+  getGame()->map[pos.y][pos.x] = VOID;
   growSnake(snake);
 }
 
@@ -62,13 +62,13 @@ Snake* initSnake() {
 
   // Init first part of the snake
   SnakePart* tail0 = (SnakePart*)malloc(sizeof(SnakePart));
-  tail0->x = widthInTiles / 2;
-  tail0->y = heightInTiles - 1;
+  tail0->pos.x = widthInTiles / 2;
+  tail0->pos.y = heightInTiles - 1;
   tail0->next = NULL; tail0->previous = NULL;
   psnake->head = tail0;
   psnake->tail = tail0;
   
-  getGame()->map[tail0->y][tail0->x] = SNAKE;
+  getGame()->map[tail0->pos.y][tail0->pos.x] = SNAKE;
 
   psnake->dir = UP;
   psnake->length = 1;
