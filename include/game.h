@@ -3,7 +3,10 @@
 #define GAME_H
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define TILE_SIZE 50 
+#define TILE_SIZE 50
+#define MAP_WIDTH SCREEN_WIDTH / TILE_SIZE
+#define MAP_HEIGHT SCREEN_HEIGHT / TILE_SIZE
+
 
 #include <SDL2/SDL.h>
 typedef struct Snake Snake;
@@ -20,7 +23,7 @@ typedef enum {
   QUIT_REQUESTED
 } GameStatus;
 
-typedef TileStatus GameMap[SCREEN_HEIGHT / TILE_SIZE][SCREEN_WIDTH / TILE_SIZE];
+typedef TileStatus GameMap[MAP_HEIGHT][MAP_WIDTH];
 
 typedef struct {
   SDL_Window *window;
