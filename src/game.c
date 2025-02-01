@@ -72,14 +72,14 @@ void destroyGame() {
   }
 
   free(game);
-  SDL_Quit();
+  SDL_Quit(); // Quit SDL subsystems
 }
 
 void initMap() {
   Game* game = getGame();
   // Initializing tilemap with void
-  for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
-    for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
       game->map[y][x] = VOID;
     }
   }
@@ -87,10 +87,7 @@ void initMap() {
 
 
 void spawnFruit() {
-  // To avoid calling rand() more than once
-  int availableTiles =
-      (SCREEN_HEIGHT * SCREEN_WIDTH) / (TILE_SIZE * TILE_SIZE) -
-      getGame()->snake->length - 1;
+  int availableTiles = MAP_HEIGHT * MAP_WIDTH - getGame()->snake->length;
 
   if (availableTiles == 0) {
     return;
@@ -99,8 +96,8 @@ void spawnFruit() {
   GameMap *map = &getGame()->map;
   int i = rand() % availableTiles;
 
-  for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
-    for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
       if ((*map)[y][x] == VOID) {
         i--;
         if (i == 0) {
@@ -113,7 +110,7 @@ void spawnFruit() {
 }
 
 void drawGame() {
-  Game* game = getGame();
+  Game *game = getGame();
   SDL_Renderer *renderer = game->renderer;
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
@@ -122,24 +119,24 @@ void drawGame() {
   SDL_Rect rect = {0, 0, TILE_SIZE, TILE_SIZE};
 
   // For each tile
-  for (int y = 0; y < SCREEN_HEIGHT / TILE_SIZE; y++) {
-    for (int x = 0; x < SCREEN_WIDTH / TILE_SIZE; x++) {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
       // Position of the rect
       rect.y = TILE_SIZE * y;
       rect.x = TILE_SIZE * x;
 
       switch (game->map[y][x]) {
-        case VOID: // Grid-like 
-          SDL_SetRenderDrawColor(renderer, 50, 50, 50, 15);
-          SDL_RenderDrawRect(renderer, &rect);
+      case VOID: // Grid-like
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 15);
+        SDL_RenderDrawRect(renderer, &rect);
         break;
-        case SNAKE: // Green
-          SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-          SDL_RenderFillRect(renderer, &rect);
+      case SNAKE: // Green
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
         break;
-        case FRUIT: // Red
-          SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-          SDL_RenderFillRect(renderer, &rect);
+      case FRUIT: // Red
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
         break;
       }
     }
@@ -187,15 +184,6 @@ void handleInput() {
           break;
       }
 
-      if (*dir == UP && newDir == DOWN)
-        return; 
-      if (*dir == DOWN && newDir == UP)
-        return;
-      if (*dir == LEFT && newDir == RIGHT)
-        return;
-      if (*dir == RIGHT && newDir == LEFT)
-        return;
-      
       *dir = newDir;
     }
   }
@@ -204,32 +192,57 @@ void handleInput() {
 void update() {
   Snake *snake = getGame()->snake;
   Direction dir = snake->dir;
-  int headX = snake->head->x, headY = snake->head->y;
+  Position headPos = snake->head->pos;
 
-  // Snake collided with the limits of the map
-  if ((headX == 0 && dir == LEFT) ||
-      (headX == SCREEN_WIDTH / TILE_SIZE - 1 && dir == RIGHT) ||
-      (headY == 0 && dir == UP) ||
-      (headY == SCREEN_HEIGHT / TILE_SIZE - 1 && dir == DOWN)) {
+  // Target position
+  Position newPos = {headPos.x + (dir == RIGHT) - (dir == LEFT),
+                     headPos.y + (dir == DOWN) - (dir == UP)};
+
+  // Snake collided with map limit
+  if (newPos.x < 0 || newPos.x == MAP_WIDTH || newPos.y < 0 ||
+      newPos.y == MAP_HEIGHT) {
     getGame()->status = QUIT_REQUESTED;
     return;
   }
 
-  TileStatus snakeTargetStatus =
-      getGame()->map[headY + (dir == DOWN) - (dir == UP)]
-                    [headX + (dir == RIGHT) - (dir == LEFT)];
+  // Checking the status of that position
+  TileStatus snakeTargetStatus = getGame()->map[newPos.y][newPos.x];
 
+  // Target status is part of Snake
   if (snakeTargetStatus == SNAKE) {
+    // Snake should not die if new direction cancels previous
+    if (POS_EQUAL(snake->head->next->pos, newPos)) {
+      switch (dir) {
+        case UP:
+          snake->dir = DOWN;
+        break;
+        case DOWN:
+          snake->dir = UP;
+        break;
+        case RIGHT:
+          snake->dir = LEFT;
+        break;
+        case LEFT:
+          snake->dir = RIGHT;
+      }
+
+      // Snake will update as it has the previous direction
+      return update();
+    }
+
+    // Snake died
     getGame()->status = QUIT_REQUESTED;
     return;
   }
 
+  // Sake will grow
   if (snakeTargetStatus == FRUIT) {
     growSnake(snake);
     spawnFruit();
     return;
   }
 
+  // Snake will just move
   moveSnake(snake);
 }
 
@@ -237,9 +250,10 @@ void run() {
   Game* game = getGame();
   game->status = RUNNING;
 
+  // Call update every 0,3 seconds
   Timer timer = {0.0f, .3f, update};
-  Uint32 frameStart = 0;
-  float dt;
+  Uint32 frameStart = 0; 
+  float dt; // seconds between frames
   while (game->status != QUIT_REQUESTED) {
     dt = calculateDeltaTime(&frameStart);
     
