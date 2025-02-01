@@ -35,5 +35,8 @@ gcc -o Snake main.c src/*.c -I./include -lSDL2
 ./Snake
 ```
 
+## Screenshot
+![Screenshot](screenshot.png)
+
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
