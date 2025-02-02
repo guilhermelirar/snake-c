@@ -19,6 +19,7 @@ typedef enum {
 typedef enum {
   RUNNING,
   PAUSED,
+  RESET_REQUESTED,
   QUIT_REQUESTED
 } GameStatus;
 
@@ -34,6 +35,9 @@ typedef struct {
 
 /* Returns the Game pointer (singleton) */
 Game* getGame();
+
+/* Initialize game */
+void startGame();
 
 /* Render contents in window */
 void drawGame();

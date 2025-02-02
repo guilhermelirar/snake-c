@@ -48,11 +48,9 @@ Game* getGame() {
   // Setting members
   game->window = window;
   game->renderer = renderer;
-  initMap();
-  game->snake = initSnake();
-  
+  game->snake = NULL;
+
   srand(time(NULL));
-  spawnFruit();
 
   return game;
 }
@@ -200,7 +198,7 @@ void update() {
   // Snake collided with map limit
   if (newPos.x < 0 || newPos.x == MAP_WIDTH || newPos.y < 0 ||
       newPos.y == MAP_HEIGHT) {
-    getGame()->status = QUIT_REQUESTED;
+    getGame()->status = RESET_REQUESTED;
     return;
   }
 
@@ -230,7 +228,7 @@ void update() {
     }
 
     // Snake died
-    getGame()->status = QUIT_REQUESTED;
+    getGame()->status = RESET_REQUESTED;
     return;
   }
 
@@ -245,15 +243,31 @@ void update() {
   moveSnake(snake);
 }
 
-void run() {
+void startGame() {
   Game* game = getGame();
   game->status = RUNNING;
+  initMap();
+  if (game->snake) {
+    destroySnake(game->snake);
+  }
+  game->snake = initSnake();
+  spawnFruit();
+}
+
+void run() {
+  Game* game = getGame();
+  startGame();
 
   // Call update every 0,3 seconds
   Timer timer = {0.0f, .3f, update};
   Uint32 frameStart = 0; 
   float dt; // seconds between frames
   while (game->status != QUIT_REQUESTED) {
+    if (game->status == RESET_REQUESTED) {
+      timer.elapsedTime = 0.0f;
+      startGame();
+    }
+
     dt = calculateDeltaTime(&frameStart);
     
     handleInput();
