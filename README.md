@@ -6,9 +6,8 @@ A classic [Snake game](https://en.wikipedia.org/wiki/Snake_(video_game_genre)) i
 
 - **Simple controls**: Arrow keys to control the direction of the snake.
 - **Fruit spawning**: Eating fruits makes the snake grow longer.
-- **Game over**: The game ends if the snake collides with the walls or its own body.
+- **Game over**: The game resets if the snake collides with the walls or its own body.
 - **Pause feature**: Press `Space` to pause and resume the game.
-*(if the player loses or reaches the maximum size, the game closes)*
 
 ## Requirements
 
