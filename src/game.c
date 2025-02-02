@@ -158,7 +158,7 @@ void handleInput() {
 
     Direction *dir = &game->snake->dir;
     Direction newDir = *dir;
-    if (event.type == SDL_KEYDOWN) {
+    if (game->status == RUNNING && event.type == SDL_KEYDOWN) {
       // Snake movement
       switch (event.key.keysym.sym) {
         case (SDLK_UP): {
