@@ -227,9 +227,12 @@ void update() {
       return update();
     }
 
-    // Snake died
-    getGame()->status = RESET_REQUESTED;
-    return;
+    // Shouldn't die if collides with tail, because tail will move out
+    if (!POS_EQUAL(snake->tail->pos, newPos)) {
+      // Snake dies
+      getGame()->status = RESET_REQUESTED;
+      return;
+    }
   }
 
   // Sake will grow
